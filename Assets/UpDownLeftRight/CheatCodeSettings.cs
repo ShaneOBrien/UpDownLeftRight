@@ -12,7 +12,7 @@ using System.Collections.Generic;
 public class CheatCode
 {
 	public string name, shortCode;
-	public List<string> cheatCode;
+	public List<KeyCode> cheatCode;
 
 }
 

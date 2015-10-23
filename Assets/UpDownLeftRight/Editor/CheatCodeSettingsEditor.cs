@@ -17,8 +17,9 @@ namespace UpDownLeftRight.Editor
 
 		private bool recordCheatCodeSequence = false;
 		private List<CheatCode> cheatCodes = new List<CheatCode>();
-		GUIContent inspectorTitle = new GUIContent("Cheat Codes");
-		GUIContent cheatLenghtLabel = new GUIContent("Cheat Code Steps[?]:", "The number of buttons you have to press before your cheat codes activate");
+		GUIContent cheatLenghtLabel = new GUIContent("Number of steps [?]:", "The number of buttons you have to press before your cheat codes activate");
+		GUIContent userFriendlyLabel = new GUIContent("Name [?]:", "The name of the cheat in a human readable format");
+		GUIContent shortCodeLabel = new GUIContent("ShortCode [?]:", "Computer friendly name, makes it easy to compare in if statements");
 
 		const string UnityAssetFolder = "Assets";
 
@@ -53,15 +54,19 @@ namespace UpDownLeftRight.Editor
 			Selection.activeObject = GetOrCreateSettingsAsset();
 		}
 
+		public void OnEnable()
+		{
+
+		}
 
 		void OnDisable()
 		{
 			// make sure the runtime code will load the Asset from Resources when it next tries to access this. 
 			CheatCodeSettings.SetInstance(null);
 		}
-
 		public override void OnInspectorGUI()
 		{
+
 			CheatCodeSettings settings = (CheatCodeSettings)target;
 			CheatCodeSettings.SetInstance(settings);
 			cheatCodes = CheatCodeSettings.CheatCodes;
@@ -76,21 +81,19 @@ namespace UpDownLeftRight.Editor
 
 			for (int i = 0; i < cheatCodes.Count; i++)
 			{
-				EditorGUILayout.LabelField("User Friendly Name");
-				cheatCodes[i].name = EditorGUILayout.TextArea(cheatCodes[i].name);
-				EditorGUILayout.LabelField("Computer Friendly Name");
-				cheatCodes[i].shortCode = EditorGUILayout.TextArea(cheatCodes[i].shortCode);
+				EditorGUILayout.LabelField("Cheat Code " + (i+1));
+				cheatCodes[i].name = EditorGUILayout.TextField(userFriendlyLabel, cheatCodes[i].name);
+				cheatCodes[i].shortCode = EditorGUILayout.TextField(shortCodeLabel, cheatCodes[i].shortCode);
+
 				EditorGUILayout.LabelField("Cheat Code Sequence");
 
-				string sequence = "No code created!";
-
-				EditorGUILayout.LabelField(sequence);
-
-				if (GUILayout.Button("Record New Sequence"))
+				for (int o = 0; o < CheatCodeSettings.CheatCodeLength; o++)
 				{
-					recordCheatCodeSequence = true;
+					GUIContent step = new GUIContent("Step " + (o + 1));
+					cheatCodes[i].cheatCode[o] = (KeyCode)EditorGUILayout.EnumPopup(step, cheatCodes[i].cheatCode[o]);
 				}
-				
+
+				EditorGUILayout.Space();
 			}
 
 			if (GUILayout.Button("Add New Cheat Code"))
@@ -98,8 +101,14 @@ namespace UpDownLeftRight.Editor
 				CheatCode newCheatCode = new CheatCode();
 				newCheatCode.name = "New Cheat Code";
 				newCheatCode.shortCode = "newCheatCode";
-				newCheatCode.cheatCode = new List<string>();
-				cheatCodes.Add(newCheatCode);
+				newCheatCode.cheatCode = new List<KeyCode>(CheatCodeSettings.CheatCodeLength);
+
+				//prepopulate with empty strings, otherwise gives error as setting the capacity above does nothing
+				for (int i = 0; i < CheatCodeSettings.CheatCodeLength; i++)
+				{
+					newCheatCode.cheatCode.Add(KeyCode.A);
+				}
+                cheatCodes.Add(newCheatCode);
 
 				CheatCodeSettings.CheatCodes = cheatCodes;
 
@@ -115,17 +124,6 @@ namespace UpDownLeftRight.Editor
 				AssetDatabase.SaveAssets();
 			}
 
-		}
-
-		public void Update()
-		{
-			if (recordCheatCodeSequence)
-			{
-				foreach (KeyCode key in Enum.GetValues(typeof(KeyCode)))
-				{
-					
-				}
-			}
 		}
 	}
 }
