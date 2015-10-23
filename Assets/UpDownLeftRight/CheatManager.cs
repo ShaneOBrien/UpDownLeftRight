@@ -5,34 +5,24 @@ using System.Collections.Generic;
 
 public class CheatManager : MonoBehaviour {
 
-	public List<string> lastInputs = new List<string>();
+	public List<KeyCode> lastInputs = new List<KeyCode>();
 
-	public List<List<string>> cheatCodes = new List<List<string>>();
+	public List<CheatCode> cheatCodes = new List<CheatCode>();
 
-	public int cheatCodeLength;
+	private int cheatCodeLength;
 
 	private bool canEnterCheats;
 
 	public void Awake()
 	{
 		//Load cheat codes from resources file
+		cheatCodes = CheatCodeSettings.CheatCodes;
+		cheatCodeLength = CheatCodeSettings.CheatCodeLength;
 	}
 
 	public void Start()
 	{
-		List<string> code1 = new List<string>();
-		code1.Add("A");
-		code1.Add("B");
-		code1.Add("C");
-		code1.Add("D");
-		code1.Add("E");
-		code1.Add("F");
-		code1.Add("G");
-		code1.Add("H");
-		code1.Add("I");
-		code1.Add("J");
 
-		cheatCodes.Add(code1);
 	}
 
 	public void Update()
@@ -41,13 +31,16 @@ public class CheatManager : MonoBehaviour {
 		{
 			if (Input.GetKeyDown(key))
 			{
-				lastInputs.Add(key.ToString());
+				lastInputs.Add(key);
+
+				Debug.Log(key);
 
 				if (lastInputs.Count >= cheatCodeLength)
 				{
-					foreach (List<string> cheatCode in cheatCodes)
+
+					foreach (CheatCode cheatCode in cheatCodes)
 					{
-						if (Enumerable.SequenceEqual(lastInputs, cheatCode))
+						if (Enumerable.SequenceEqual(lastInputs, cheatCode.cheatCodeSequence))
 						{
 							Debug.Log("We Got a match!");
 						}
@@ -56,10 +49,13 @@ public class CheatManager : MonoBehaviour {
 							Debug.Log("No Match");
 						}
 					}
+
 					lastInputs.Clear();
 				}
 			}
 		}
+
+		
 	}
 
 	public void EnableCheatEntering()

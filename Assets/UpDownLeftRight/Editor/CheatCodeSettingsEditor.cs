@@ -14,8 +14,6 @@ namespace UpDownLeftRight.Editor
 	[CustomEditor(typeof(CheatCodeSettings))]
 	public class CheatCodeSettingsEditor : UnityEditor.Editor
 	{
-
-		private bool recordCheatCodeSequence = false;
 		private List<CheatCode> cheatCodes = new List<CheatCode>();
 		GUIContent cheatLenghtLabel = new GUIContent("Number of steps [?]:", "The number of buttons you have to press before your cheat codes activate");
 		GUIContent userFriendlyLabel = new GUIContent("Name [?]:", "The name of the cheat in a human readable format");
@@ -54,11 +52,6 @@ namespace UpDownLeftRight.Editor
 			Selection.activeObject = GetOrCreateSettingsAsset();
 		}
 
-		public void OnEnable()
-		{
-
-		}
-
 		void OnDisable()
 		{
 			// make sure the runtime code will load the Asset from Resources when it next tries to access this. 
@@ -81,7 +74,7 @@ namespace UpDownLeftRight.Editor
 
 			for (int i = 0; i < cheatCodes.Count; i++)
 			{
-				EditorGUILayout.LabelField("Cheat Code " + (i+1));
+				EditorGUILayout.LabelField("Cheat Code " + (i+1) + " - " + cheatCodes[i].name);
 				cheatCodes[i].name = EditorGUILayout.TextField(userFriendlyLabel, cheatCodes[i].name);
 				cheatCodes[i].shortCode = EditorGUILayout.TextField(shortCodeLabel, cheatCodes[i].shortCode);
 
@@ -90,7 +83,13 @@ namespace UpDownLeftRight.Editor
 				for (int o = 0; o < CheatCodeSettings.CheatCodeLength; o++)
 				{
 					GUIContent step = new GUIContent("Step " + (o + 1));
-					cheatCodes[i].cheatCode[o] = (KeyCode)EditorGUILayout.EnumPopup(step, cheatCodes[i].cheatCode[o]);
+					cheatCodes[i].cheatCodeSequence[o] = (KeyCode)EditorGUILayout.EnumPopup(step, cheatCodes[i].cheatCodeSequence[o]);
+				}
+
+				if (GUILayout.Button("Delete this cheat code!"))
+				{
+					cheatCodes.Remove(cheatCodes[i]);
+					SaveAsset(settings);
 				}
 
 				EditorGUILayout.Space();
@@ -101,29 +100,30 @@ namespace UpDownLeftRight.Editor
 				CheatCode newCheatCode = new CheatCode();
 				newCheatCode.name = "New Cheat Code";
 				newCheatCode.shortCode = "newCheatCode";
-				newCheatCode.cheatCode = new List<KeyCode>(CheatCodeSettings.CheatCodeLength);
+				newCheatCode.cheatCodeSequence = new List<KeyCode>(CheatCodeSettings.CheatCodeLength);
 
 				//prepopulate with empty strings, otherwise gives error as setting the capacity above does nothing
 				for (int i = 0; i < CheatCodeSettings.CheatCodeLength; i++)
 				{
-					newCheatCode.cheatCode.Add(KeyCode.A);
+					newCheatCode.cheatCodeSequence.Add(KeyCode.A);
 				}
                 cheatCodes.Add(newCheatCode);
 
-				CheatCodeSettings.CheatCodes = cheatCodes;
-
-				EditorUtility.SetDirty(settings);
-				AssetDatabase.Refresh();
+				SaveAsset(settings);
 			}
 
 			if (GUI.changed)
 			{
 				Debug.Log("gui changed");
-				CheatCodeSettings.CheatCodes = cheatCodes;
-				EditorUtility.SetDirty(settings);
-				AssetDatabase.SaveAssets();
+				SaveAsset(settings);
 			}
 
+		}
+		public void SaveAsset(CheatCodeSettings settings)
+		{
+			CheatCodeSettings.CheatCodes = cheatCodes;
+			EditorUtility.SetDirty(settings);
+			AssetDatabase.SaveAssets();
 		}
 	}
 }
