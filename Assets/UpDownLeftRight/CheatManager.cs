@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 public class CheatManager : MonoBehaviour {
 
@@ -11,9 +11,15 @@ public class CheatManager : MonoBehaviour {
 
 	public int cheatCodeLength;
 
-	// Use this for initialization
-	void Start () {
+	private bool canEnterCheats;
 
+	public void Awake()
+	{
+		//Load cheat codes from resources file
+	}
+
+	public void Start()
+	{
 		List<string> code1 = new List<string>();
 		code1.Add("A");
 		code1.Add("B");
@@ -28,24 +34,43 @@ public class CheatManager : MonoBehaviour {
 
 		cheatCodes.Add(code1);
 	}
-	
-	// Update is called once per frame
-	void Update () {
+
+	public void Update()
+	{
 		foreach (KeyCode key in Enum.GetValues(typeof(KeyCode)))
 		{
 			if (Input.GetKeyDown(key))
 			{
 				lastInputs.Add(key.ToString());
-				foreach (List<string> cheatCode in cheatCodes)
+
+				if (lastInputs.Count >= cheatCodeLength)
 				{
-					if (Enumerable.SequenceEqual(lastInputs.OrderBy(t => t), cheatCode.OrderBy(t => t)))
+					foreach (List<string> cheatCode in cheatCodes)
 					{
-						Debug.Log("We Got a match!");
-						lastInputs.Clear();
+						if (Enumerable.SequenceEqual(lastInputs, cheatCode))
+						{
+							Debug.Log("We Got a match!");
+						}
+						else
+						{
+							Debug.Log("No Match");
+						}
 					}
+					lastInputs.Clear();
 				}
-				
 			}
 		}
+	}
+
+	public void EnableCheatEntering()
+	{
+		canEnterCheats = true;
+		lastInputs.Clear();
+	}
+
+	public void DisableCheatEntering()
+	{
+		canEnterCheats = false;
+		lastInputs.Clear();
 	}
 }
