@@ -3,11 +3,6 @@ using System.IO;
 using System;
 using System.Collections.Generic;
 
-/// <summary>
-/// GameSparks settings which are used with <see cref="GameSparksUnity"/> to 
-/// connect to the GameSparks backend. 
-/// </summary>
-
 [Serializable]
 public class CheatCode
 {

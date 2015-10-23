@@ -8,9 +8,7 @@ using System.Reflection;
 
 namespace UpDownLeftRight.Editor
 {
-	/// <summary>
-	/// Editor class for <see cref="CheatCodeSettings"/>
-	/// </summary>
+
 	[CustomEditor(typeof(CheatCodeSettings))]
 	public class CheatCodeSettingsEditor : UnityEditor.Editor
 	{
